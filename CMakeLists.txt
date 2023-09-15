@@ -14,6 +14,11 @@ if(POLICY CMP0077)
   cmake_policy(SET CMP0077 NEW)
 endif()
 
+if(POLICY CMP0148)
+  #enable FindPythonInterp
+  cmake_policy(SET CMP0148 OLD)
+endif()
+
 if(NOT DEFINED LLVM_VERSION_MAJOR)
   set(LLVM_VERSION_MAJOR 9)
 endif()
