@@ -191,6 +191,7 @@ void WebAssemblyAsmPrinter::EmitEndOfAsmFile(Module &M) {
   bool has_abi    = false;
   bool has_eosio_action = false;
   bool has_eosio_notify = false;
+  bool has_eosio_call   = false;
   for (const auto &F : M) {
      if (F.hasFnAttribute("eosio_wasm_import"))
         has_import = true;
@@ -200,6 +201,8 @@ void WebAssemblyAsmPrinter::EmitEndOfAsmFile(Module &M) {
         has_eosio_action = true;
      if (F.hasFnAttribute("eosio_wasm_notify"))
         has_eosio_notify = true;
+     if (F.hasFnAttribute("eosio_wasm_call"))
+        has_eosio_call = true;
   }
 
   if (has_import) {
@@ -257,6 +260,21 @@ void WebAssemblyAsmPrinter::EmitEndOfAsmFile(Module &M) {
            StringRef name = F.getFnAttribute("eosio_wasm_notify").getValueAsString();
            OutStreamer->EmitULEB128IntValue(name.size());
            OutStreamer->EmitBytes(name);
+        }
+     }
+     OutStreamer->PopSection();
+  }
+  if (has_eosio_call) {
+     OutStreamer->PushSection();
+     std::string SectionName = ".eosio_calls";
+     MCSectionWasm *mySection =
+         OutContext.getWasmSection(SectionName, SectionKind::getMetadata());
+     OutStreamer->SwitchSection(mySection);
+     for (const auto &F : M) {
+        if (F.hasFnAttribute("eosio_wasm_call")) {
+           StringRef call_name = F.getFnAttribute("eosio_wasm_call").getValueAsString();
+           OutStreamer->EmitULEB128IntValue(call_name.size());
+           OutStreamer->EmitBytes(call_name);
         }
      }
      OutStreamer->PopSection();
