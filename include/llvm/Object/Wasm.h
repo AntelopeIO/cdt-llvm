@@ -150,6 +150,7 @@ public:
   ArrayRef<wasm::WasmFunctionName> debugNames() const { return DebugNames; }
   ArrayRef<StringRef> allowed_imports() const { return AllowedImports; }
   ArrayRef<StringRef> actions() const { return Actions; }
+  ArrayRef<StringRef> calls() const { return Calls; }
   ArrayRef<StringRef> notify() const { return Notify; }
   StringRef get_eosio_abi() const { return eosio_abi; }
   uint32_t startFunction() const { return StartFunction; }
@@ -257,6 +258,7 @@ private:
   Error parseNameSection(ReadContext &Ctx);
   Error parseAllowedSection(ReadContext &Ctx);
   Error parseActionsSection(ReadContext &Ctx);
+  Error parseCallsSection(ReadContext &Ctx);
   Error parseNotifySection(ReadContext &Ctx);
   Error parseLinkingSection(ReadContext &Ctx);
   Error parseLinkingSectionSymtab(ReadContext &Ctx);
@@ -280,6 +282,7 @@ private:
   std::vector<wasm::WasmImport> Imports;
   std::vector<StringRef> AllowedImports;
   std::vector<StringRef> Actions;
+  std::vector<StringRef> Calls;
   std::vector<StringRef> Notify;
   std::vector<wasm::WasmExport> Exports;
   std::vector<wasm::WasmElemSegment> ElemSegments;
