@@ -359,6 +359,18 @@ Error WasmObjectFile::parseActionsSection(ReadContext& Ctx) {
    return Error::success();
 }
 
+Error WasmObjectFile::parseCallsSection(ReadContext& Ctx) {
+   while (Ctx.Ptr < Ctx.End) {
+    StringRef Name = readString(Ctx);
+    Calls.push_back(Name);
+   }
+
+   if (Ctx.Ptr != Ctx.End)
+      return make_error<GenericBinaryError>("calls section ended prematurely",
+                                          object_error::parse_failed);
+   return Error::success();
+}
+
 Error WasmObjectFile::parseNotifySection(ReadContext& Ctx) {
    while (Ctx.Ptr < Ctx.End) {
     StringRef Name = readString(Ctx);
@@ -897,6 +909,9 @@ Error WasmObjectFile::parseCustomSection(WasmSection &Sec, ReadContext &Ctx) {
         return Err;
   } else if (Sec.Name == ".eosio_actions") {
      if (Error Err = parseActionsSection(Ctx))
+        return Err;
+  } else if (Sec.Name == ".eosio_calls") {
+     if (Error Err = parseCallsSection(Ctx))
         return Err;
   } else if (Sec.Name == ".eosio_notify") {
      if (Error Err = parseNotifySection(Ctx))
